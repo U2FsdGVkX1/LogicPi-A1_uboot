@@ -1,0 +1,5 @@
+# Regenerable build outputs (mk rebuilds these every run)
+build/
+bl33/v2023/build/
+bl33z/build/
+fip/_tmp/
