@@ -63,6 +63,31 @@ int dram_init(void)
 	return 0;
 }
 
+int dram_init_banksize(void)
+{
+	phys_size_t ram_size;
+	phys_size_t low_size;
+
+	/* gd->ram_size already has CONFIG_SYS_MEM_TOP_HIDE removed here. */
+	ram_size = (readl(SYSCTRL_SEC_STATUS_REG4) & ~0xfffffUL) << 4;
+	low_size = ram_size;
+	if (low_size > 0xe0000000ULL)
+		low_size = 0xe0000000ULL;
+
+	gd->bd->bi_dram[0].start = 0;
+	gd->bd->bi_dram[0].size = low_size;
+
+	gd->bd->bi_dram[1].start = 0;
+	gd->bd->bi_dram[1].size = 0;
+	if (ram_size > low_size) {
+		/* Leave the 512 MiB 32-bit MMIO aperture out of DRAM. */
+		gd->bd->bi_dram[1].start = 0x100000000ULL;
+		gd->bd->bi_dram[1].size = ram_size - low_size;
+	}
+
+	return 0;
+}
+
 /* secondary_boot_func
  * this function should be write with asm, here, is only for compiling pass
  */
