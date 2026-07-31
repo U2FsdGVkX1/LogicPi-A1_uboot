@@ -293,13 +293,17 @@ static void add_map(struct mm_region *map)
 
 extern unsigned long __RO_END__;
 extern unsigned long __RO_START__;
+extern unsigned long __efi_runtime_data_start;
+extern unsigned long __efi_runtime_data_stop;
 #define _text_end (unsigned long)(&__RO_END__)
 #define _text_start (unsigned long)(&__RO_START__)
 void mmu_update_text_attr(void)
 {
 	struct mm_region mem_map;
+	unsigned long efi_data_start, efi_data_end;
 
 	dcache_disable();
+
 	mem_map.virt = _text_start;
 	mem_map.phys = _text_start;
 	mem_map.size = _text_end -  _text_start;
@@ -308,6 +312,20 @@ void mmu_update_text_attr(void)
 
 	add_map(&mem_map);
 	dcache_enable();
+
+	efi_data_start = (unsigned long)&__efi_runtime_data_start;
+	efi_data_end = (unsigned long)&__efi_runtime_data_stop;
+	if (efi_data_end > efi_data_start) {
+		dcache_disable();
+		mem_map.virt = efi_data_start;
+		mem_map.phys = efi_data_start;
+		mem_map.size = efi_data_end - efi_data_start;
+		mem_map.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
+					 PTE_BLOCK_INNER_SHARE;
+
+		add_map(&mem_map);
+		dcache_enable();
+	}
 }
 
 enum pte_type {

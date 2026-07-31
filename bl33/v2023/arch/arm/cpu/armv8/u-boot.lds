@@ -34,8 +34,12 @@ SECTIONS
                 __efi_runtime_start = .;
 		*(.text.efi_runtime*)
 		*(.rodata.efi_runtime*)
+		. = ALIGN(4096);
+                __efi_runtime_data_start = .;
 		*(.data.efi_runtime*)
-                __efi_runtime_stop = .;
+		. = ALIGN(4096);
+                __efi_runtime_data_stop = .;
+		__efi_runtime_stop = .;
 	}
 
 	.text_rest :
