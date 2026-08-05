@@ -136,7 +136,8 @@
 		"run storeargs;"\
 		"run upgrade_key;" \
 		"bcb uboot-command;"\
-		"run switch_bootmode;"
+		"run switch_bootmode;"\
+		"usb start;"
 #else
 #define CONFIG_PREBOOT  "echo preboot"
 #endif
@@ -430,4 +431,3 @@ defined(CONFIG_STORE_COMPATIBLE)
 #define CONFIG_AML_KASLR_SEED
 
 #endif
-
